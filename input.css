@@ -1,0 +1,236 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: 'Anton', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --color-ink: #19170f;
+  --color-concrete: #211f1a;
+  --color-paper: #f2ede3;
+  --color-paper-dim: #e7e0d1;
+  --color-cobalt: #2b46ff;
+  --color-mustard: #e8a33d;
+  --color-grey: #8a8375;
+}
+
+@layer base {
+  h1, h2, h3, .display {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    line-height: 0.92;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Foco visible y consistente para navegación por teclado */
+  :focus-visible {
+    outline: 2px solid var(--color-cobalt);
+    outline-offset: 3px;
+  }
+
+  /* Respeta la preferencia de "menos movimiento" del sistema operativo */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Tag / etiqueta punteada — el elemento firma del diseño */
+  .tag {
+    @apply relative inline-block bg-paper text-ink border-[1.5px] border-dashed border-ink
+           px-3.5 py-1.5 pl-5 font-mono text-xs font-semibold -rotate-2;
+  }
+  .tag::before {
+    content: '';
+    @apply absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full
+           bg-paper border-[1.5px] border-dashed border-ink;
+  }
+
+  .cta-btn {
+    @apply bg-cobalt text-paper px-4.5 py-2.5 font-mono text-[13px] font-semibold
+           border border-cobalt tracking-wide transition-opacity hover:opacity-85;
+  }
+  .cta-outline {
+    @apply bg-transparent text-paper border border-white/15;
+  }
+
+  /* Ticker */
+  .ticker-track {
+    animation: scroll 22s linear infinite;
+  }
+  @keyframes scroll {
+    to { transform: translateX(-50%); }
+  }
+
+  /* Filtro de categorías — min-height 44px para un target táctil cómodo */
+  .chip {
+    @apply flex-none flex items-center gap-1.5 px-4 py-2.5 min-h-11 border-[1.5px] border-ink
+           bg-transparent text-ink font-mono text-[12.5px] font-semibold cursor-pointer
+           whitespace-nowrap transition-colors hover:bg-ink/5;
+  }
+  .chip.active {
+    @apply bg-ink text-paper border-ink hover:bg-ink;
+  }
+  .chip .count { @apply opacity-50 text-[11px]; }
+  .chip.active .count { @apply text-mustard opacity-100; }
+
+  .sort-tab {
+    @apply px-3.5 py-2 min-h-10 font-mono text-[11.5px] border border-ink/20 text-grey
+           bg-transparent cursor-pointer transition-colors hover:border-ink/40;
+  }
+  .sort-tab.active { @apply border-cobalt text-cobalt; }
+
+  .talles-btn {
+    @apply font-mono text-[11.5px] font-semibold text-ink border border-dashed border-ink
+           bg-transparent px-3.5 py-2 min-h-10 flex items-center gap-1.5 cursor-pointer
+           transition-colors hover:bg-ink/5;
+  }
+
+  /* Card de producto */
+  .card-media {
+    @apply aspect-[3/4] flex items-center justify-center text-paper/35 font-mono text-xs
+    bg-gradient-to-br from-[#2a2820] to-[#151310] overflow-hidden relative;
+  }
+  .card-media img { @apply transition-transform duration-500 ease-out; }
+  .product-card:hover .card-media img,
+  .product-card:focus-within .card-media img { @apply scale-110; }
+  .product-card { @apply transition-all duration-300; }
+  .product-card:hover,
+  .product-card:focus-within { @apply -translate-y-1.5; box-shadow: 0 18px 34px -14px rgba(25,23,15,0.35); }
+
+  /* Nombre de producto — alto fijo de 2 líneas para que la grilla quede prolija
+     sin importar si el nombre es corto o largo */
+  .card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.6em;
+  }
+
+  /* Skeleton de carga del catálogo */
+  .skeleton-card {
+    @apply aspect-[3/4] relative overflow-hidden bg-[#211f1a];
+  }
+  .skeleton-card::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(90deg, transparent, rgba(242,237,227,0.06), transparent);
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* Scroll reveal — visible por defecto SIEMPRE; la animación es un extra, no una condición */
+  .reveal { opacity: 1; }
+  .reveal.animate-in {
+    animation: revealIn .7s cubic-bezier(.16,1,.3,1) both;
+  }
+  @keyframes revealIn {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Contador animado */
+  .stat-num { @apply font-display text-cobalt; font-variant-numeric: tabular-nums; }
+
+  /* Badge "viendo ahora" */
+  .live-badge {
+    @apply absolute top-2 right-2 flex items-center gap-1.5 bg-ink/85 backdrop-blur-sm
+    text-paper font-mono text-[9.5px] px-2 py-1 z-10;
+  }
+  .live-dot { @apply w-1.5 h-1.5 rounded-full bg-mustard; animation: livepulse 1.6s ease-in-out infinite; }
+  @keyframes livepulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .4; transform: scale(.7); }
+  }
+
+  /* Badge NUEVO / TOP en la esquina de la card */
+  .prod-badge {
+    @apply absolute top-2 left-2 z-10 font-mono text-[9.5px] font-bold tracking-wide
+    px-2 py-1;
+  }
+  .prod-badge.top { @apply bg-mustard text-ink; }
+  .prod-badge.nuevo { @apply bg-cobalt text-paper; }
+
+  /* Selector de talle dentro de la card */
+  .size-chip {
+    @apply font-mono text-[10.5px] font-semibold px-1.5 min-w-6 h-6 flex items-center justify-center
+    border border-white/20 text-paper/60 bg-transparent cursor-pointer transition-colors;
+  }
+  .size-chip:hover { @apply border-white/50 text-paper; }
+  .size-chip.active { @apply bg-paper text-ink border-paper; }
+
+  /* Buscador del catálogo */
+  .search-input {
+    @apply w-full bg-transparent border-[1.5px] border-ink/20 font-mono text-[13px]
+    px-3.5 py-2.5 min-h-11 placeholder:text-grey focus:border-ink transition-colors;
+  }
+
+  /* Indicador de horario de atención */
+  .wa-status-dot { @apply w-2 h-2 rounded-full inline-block shrink-0; }
+  .wa-status-dot.open { @apply bg-[#25D366]; animation: livepulse 1.8s ease-in-out infinite; }
+  .wa-status-dot.closed { @apply bg-grey; }
+
+  /* Carrito lateral */
+  .cart-backdrop {
+    @apply fixed inset-0 bg-ink/70 z-[100] opacity-0 pointer-events-none transition-opacity duration-300;
+  }
+  .cart-backdrop.open { @apply opacity-100 pointer-events-auto; }
+  .cart-drawer {
+    @apply fixed top-0 right-0 bottom-0 z-[101] w-full sm:w-[420px] bg-paper text-ink
+    flex flex-col translate-x-full transition-transform duration-300 ease-out;
+  }
+  .cart-drawer.open { @apply translate-x-0; }
+  .cart-row {
+    @apply flex gap-3 items-start py-3.5 border-b border-ink/10;
+  }
+  .cart-row img, .cart-row .no-img {
+    @apply w-14 h-16 object-cover bg-ink/5 shrink-0 font-mono text-[8px] text-grey flex items-center justify-center text-center;
+  }
+
+  /* Botón WhatsApp flotante — respeta el safe-area de notch/home-indicator en iOS */
+  .wa-float {
+    @apply fixed right-4 sm:right-6 z-50 flex items-center gap-2 bg-[#25D366] text-white
+    font-mono text-[13px] font-semibold px-4 py-3.5 rounded-full shadow-lg
+    opacity-0 translate-y-4 pointer-events-none transition-all duration-300;
+    bottom: max(1.5rem, env(safe-area-inset-bottom) + 1rem);
+  }
+  .wa-float.show { @apply opacity-100 translate-y-0 pointer-events-auto; }
+  .wa-float::before {
+    content: ''; @apply absolute inset-0 rounded-full -z-10;
+    animation: wapulse 2.2s ease-out infinite;
+  }
+  @keyframes wapulse {
+    0% { box-shadow: 0 0 0 0 rgba(37,211,102,.55); }
+    100% { box-shadow: 0 0 0 16px rgba(37,211,102,0); }
+  }
+
+  /* Confetti al agregar */
+  .confetti-piece {
+    position: fixed; width: 7px; height: 7px; pointer-events: none; z-index: 60;
+    animation: confetti-fall .9s ease-out forwards;
+  }
+  @keyframes confetti-fall {
+    0% { transform: translate(0,0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+  }
+
+  /* Cart badge en nav */
+  .cart-pulse { animation: cartpulse .4s ease; }
+  @keyframes cartpulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.35); }
+  }
+}
